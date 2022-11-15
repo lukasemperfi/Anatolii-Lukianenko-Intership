@@ -1,0 +1,20 @@
+//Page container width
+$page-container-width: 1200px;
+
+//Breakpoints
+$screen-sm-min: 576px;
+$screen-md-min: 768px;
+$screen-lg-min: 992px;
+$screen-xl-min: 1200px;
+
+//Colors
+$black: #000000;
+$white: #ffffff;
+$gray: #d7d5d5;
+$primary: #181818;
+$secondary: #e50914;
+
+//Poster image size
+$poster-image-width: 342px;
+$poster-image-height: 513px;
+$poster-image-ratio: calc($poster-image-width / $poster-image-height);

@@ -1,0 +1,45 @@
+version: '3.4'
+
+services:
+  mysql:
+    image: mysql
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: time
+    ports:
+      - '7000:7000'
+    volumes:
+      - mysql_data:/var/lib/mysql
+  api:
+    build: ./
+    restart: always
+    command: sh -c "npm run migrate && npm run dev"
+    ports:
+      - '5000:5000'
+    depends_on:
+      - mysql
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PORT: 3306
+      MYSQL_PASSWORD: password
+      MYSQL_DB: time
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d
+    depends_on:
+      - api
+    ports:
+      - '8888:8888'
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - '8000:8080'
+    depends_on:
+      - mysql
+volumes:
+  mysql_data:

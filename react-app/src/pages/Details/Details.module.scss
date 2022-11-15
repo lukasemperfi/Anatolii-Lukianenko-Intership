@@ -1,0 +1,56 @@
+@use "../../styles/variables" as v;
+@use "../../styles/mixins/breakpoints";
+
+.movie-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  @include breakpoints.xl {
+    flex-direction: row;
+  }
+
+  &__poster {
+    flex: 1 1 30%;
+  }
+
+  &__info {
+    flex: 1 1 70%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    line-height: 1.2;
+
+    .title {
+      font-size: 44px;
+      line-height: 1.4;
+      @include breakpoints.sm {
+        font-size: 64px;
+        line-height: 1.2;
+      }
+    }
+
+    .genres {
+      display: flex;
+      gap: 5px;
+
+      &__item {
+        border: 2px solid v.$white;
+        background-color: v.$black;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 8px;
+        @include breakpoints.sm {
+          padding: 8px 24px;
+        }
+      }
+    }
+  }
+}
+
+.cast {
+  &__header {
+    font-weight: 600;
+  }
+}

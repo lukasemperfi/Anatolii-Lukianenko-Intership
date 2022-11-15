@@ -1,0 +1,9 @@
+.cast {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  &__name {
+    font-size: 13px;
+  }
+}

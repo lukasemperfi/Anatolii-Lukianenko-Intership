@@ -1,0 +1,13 @@
+@use "../../styles/variables" as v;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: v.$primary;
+}
+
+.main {
+  flex: 1 1 auto;
+  display: flex;
+}
