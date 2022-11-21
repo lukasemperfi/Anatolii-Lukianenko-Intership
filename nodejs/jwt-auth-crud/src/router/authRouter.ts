@@ -1,17 +1,19 @@
-import express from "express";
+import express, { Router } from "express";
 
 import { userController } from "../controllers/userController";
-import { body } from "express-validator";
-import { authCheck } from "../middleware/authCheck";
+import { validate } from "../middleware/validation/validate";
+import { userAuthSchema } from "../middleware/validation/userAuthSchema";
+import { asyncHandler } from "../utils/asyncHandler";
 
-export const authRouter = express.Router();
+export const createAuthRoutes = (): Router => {
+  const authRouter = express.Router();
 
-authRouter.post(
-  "/registration",
-  body("email").isEmail(),
-  body("password").isLength({ min: 3, max: 32 }),
-  userController.registration
-);
-authRouter.post("/login", userController.login);
-authRouter.post("/logout", userController.logout);
-authRouter.get("/refresh", userController.refresh);
+  authRouter.use(validate(userAuthSchema));
+
+  authRouter.post("/registration", asyncHandler(userController.registration));
+  authRouter.post("/login", asyncHandler(userController.login));
+  authRouter.post("/logout", asyncHandler(userController.logout));
+  authRouter.get("/refresh", asyncHandler(userController.refresh));
+
+  return authRouter;
+};

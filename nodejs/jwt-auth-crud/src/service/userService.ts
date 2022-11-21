@@ -6,7 +6,7 @@ import { tokenService } from "./tokenService";
 import { User } from "../db/models/user";
 
 class UserService {
-  async registration(email: string, password: string) {
+  async registration(email: string, password: string): Promise<UserDto> {
     const candidate = await User.query().findOne({ email });
 
     if (candidate) {
@@ -27,10 +27,10 @@ class UserService {
 
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
 
-    return { ...tokens, user: userDto };
+    return { ...tokens, ...userDto };
   }
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string): Promise<UserDto> {
     const user = await User.query().findOne({ email });
 
     if (!user) {
@@ -48,16 +48,16 @@ class UserService {
 
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
 
-    return { ...tokens, user: userDto };
+    return { ...tokens, ...userDto };
   }
 
-  async logout(refreshToken: string) {
-    const token = await tokenService.removeToken(refreshToken);
+  async logout(refreshToken: string): Promise<number> {
+    const numDeleted = await tokenService.removeToken(refreshToken);
 
-    return token;
+    return numDeleted;
   }
 
-  async refresh(refreshToken: string) {
+  async refresh(refreshToken: string): Promise<UserDto> {
     if (!refreshToken) {
       throw ApiError.UnauthorizedError();
     }
@@ -71,14 +71,16 @@ class UserService {
 
     const user = await User.query().findById(userData.id);
 
-    if (user) {
-      const userDto = new UserDto(user);
-      const tokens = tokenService.generateTokens({ ...userDto });
-
-      await tokenService.saveToken(userDto.id, tokens.refreshToken);
-
-      return { ...tokens, user: userDto };
+    if (!user) {
+      throw ApiError.BadRequest(`Пользователь с не найден`);
     }
+
+    const userDto = new UserDto(user);
+    const tokens = tokenService.generateTokens({ ...userDto });
+
+    await tokenService.saveToken(userDto.id, tokens.refreshToken);
+
+    return { ...tokens, ...userDto };
   }
 }
 

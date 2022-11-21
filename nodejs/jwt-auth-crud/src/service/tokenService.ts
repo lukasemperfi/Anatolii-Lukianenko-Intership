@@ -4,7 +4,10 @@ import { Token } from "../db/models/token";
 import { UserDto } from "../dto/userDto";
 
 class TokenService {
-  generateTokens(payload: UserDto) {
+  generateTokens(payload: UserDto): {
+    accessToken: string;
+    refreshToken: string;
+  } {
     const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET || "", {
       expiresIn: "30m",
     });
@@ -20,35 +23,30 @@ class TokenService {
     };
   }
 
-  validateAccessToken(token: string) {
-    try {
-      const userData = jwt.verify(token, process.env.JWT_ACCESS_SECRET || "");
+  validateAccessToken(token: string): UserDto {
+    const userData = jwt.verify(token, process.env.JWT_ACCESS_SECRET || "");
 
-      return userData as UserDto;
-    } catch (error) {
-      return null;
-    }
+    return userData as UserDto;
   }
 
-  validateRefreshToken(token: string) {
-    try {
-      const userData = jwt.verify(token, process.env.JWT_REFRESH_SECRET || "");
+  validateRefreshToken(token: string): UserDto {
+    const userData = jwt.verify(token, process.env.JWT_REFRESH_SECRET || "");
 
-      return userData as UserDto;
-    } catch (error) {
-      return null;
-    }
+    return userData as UserDto;
   }
 
-  async saveToken(userId: number, refreshToken: string) {
+  async saveToken(
+    userId: number,
+    refreshToken: string
+  ): Promise<number | Token> {
     const tokenData = await Token.query().findOne({ user_id: userId });
 
     if (tokenData) {
-      const tokenNew = await Token.query()
+      const tokenNewId = await Token.query()
         .findOne({ user_id: userId })
         .patch({ refreshToken: refreshToken });
 
-      return tokenNew;
+      return tokenNewId;
     }
 
     const token = await Token.query().insert({ user_id: userId, refreshToken });
@@ -56,15 +54,15 @@ class TokenService {
     return token;
   }
 
-  async removeToken(refreshToken: string) {
-    const tokenData = await Token.query()
+  async removeToken(refreshToken: string): Promise<number> {
+    const deleteNum = await Token.query()
       .delete()
       .where("refreshToken", "=", refreshToken);
 
-    return tokenData;
+    return deleteNum;
   }
 
-  async findToken(refreshToken: string) {
+  async findToken(refreshToken: string): Promise<Token | undefined> {
     const tokenData = await Token.query().findOne({ refreshToken });
 
     return tokenData;

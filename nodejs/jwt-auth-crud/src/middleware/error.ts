@@ -22,6 +22,8 @@ export const errorMiddleware = (
 
   logger.error("500 - Непредвиденная ошибка");
 
+  console.log(err);
+
   return res.status(500).json({
     message: "Непредвиденная ошибка",
   });

@@ -25,7 +25,8 @@
     "nodemailer": "6.8.0",
     "objection": "3.0.1",
     "uuid": "9.0.0",
-    "winston": "3.8.2"
+    "winston": "3.8.2",
+    "yup": "0.32.11"
   },
   "devDependencies": {
     "@types/bcrypt": "5.0.0",

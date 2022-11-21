@@ -1,15 +1,20 @@
 import { Task } from "../db/models/task";
 import { TaskDto } from "../dto/taskDto";
+import { ApiError } from "../exceptions/api-error";
 import { updateTask } from "../queues/task-queue";
 
 class TaskService {
-  public getAll = async (user_id: number) => {
+  public getAll = async (user_id: number): Promise<Task[]> => {
     const tasks = await Task.query().where("user_id", user_id);
 
     return tasks;
   };
 
-  public create = async (name: string, completed: boolean, user_id: number) => {
+  public create = async (
+    name: string,
+    completed: boolean,
+    user_id: number
+  ): Promise<Task> => {
     const task = await Task.query().insertAndFetch({
       name,
       completed,
@@ -19,20 +24,19 @@ class TaskService {
     return task;
   };
 
-  public update = async (taskInfo: TaskDto) => {
+  public update = async (taskInfo: TaskDto): Promise<void> => {
     await updateTask(taskInfo);
   };
 
-  public delete = async (taskId: number) => {
+  public delete = async (taskId: number): Promise<number> => {
     const task = await Task.query().findOne({ id: taskId });
 
-    if (task) {
-      console.log("from");
-
-      const numDeleted = await Task.query().deleteById(taskId);
-
-      return numDeleted;
+    if (!task) {
+      throw ApiError.BadRequest(`Task ${taskId} не найдена`);
     }
+    const numDeleted = await Task.query().deleteById(taskId);
+
+    return numDeleted;
   };
 }
 
